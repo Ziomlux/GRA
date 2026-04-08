@@ -1,0 +1,479 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary: #7b2fff;
+  --secondary: #00d4ff;
+  --accent: #ff6b35;
+  --dark: #0a0a1a;
+  --text: #e8e8ff;
+}
+
+body {
+  background: var(--dark);
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ===================== START SCREEN ===================== */
+#start-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: radial-gradient(ellipse at 50% 40%, #1a0a3e 0%, #050510 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#start-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(123,47,255,0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(0,212,255,0.1) 0%, transparent 50%);
+  animation: bgPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes bgPulse {
+  from { opacity: 0.5; }
+  to { opacity: 1; }
+}
+
+.start-content {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Portal Logo */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.portal-logo {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.portal-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  animation: spinRing linear infinite;
+}
+
+.ring1 {
+  width: 120px;
+  height: 120px;
+  border-top-color: #7b2fff;
+  border-right-color: #7b2fff;
+  animation-duration: 2s;
+}
+
+.ring2 {
+  width: 90px;
+  height: 90px;
+  border-bottom-color: #00d4ff;
+  border-left-color: #00d4ff;
+  animation-duration: 1.5s;
+  animation-direction: reverse;
+}
+
+.ring3 {
+  width: 60px;
+  height: 60px;
+  border-top-color: #ff6b35;
+  border-right-color: #ff6b35;
+  animation-duration: 1s;
+}
+
+@keyframes spinRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.portal-inner {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #00d4ff, #7b2fff);
+  animation: portalPulse 2s ease-in-out infinite;
+  box-shadow: 0 0 20px #7b2fff, 0 0 40px #00d4ff55;
+}
+
+@keyframes portalPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 20px #7b2fff, 0 0 40px #00d4ff55; }
+  50% { transform: scale(1.2); box-shadow: 0 0 30px #7b2fff, 0 0 60px #00d4ffaa; }
+}
+
+/* Title */
+.game-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #ffffff, #00d4ff, #7b2fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  letter-spacing: 4px;
+  margin-bottom: 12px;
+}
+
+.game-title span {
+  font-size: 38px;
+  letter-spacing: 12px;
+}
+
+.game-subtitle {
+  font-size: 18px;
+  color: rgba(232,232,255,0.6);
+  letter-spacing: 2px;
+  margin-bottom: 32px;
+}
+
+/* Worlds Preview */
+.worlds-preview {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.world-badge {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--color, #7b2fff);
+  color: var(--color, #7b2fff);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  background: rgba(0,0,0,0.3);
+  transition: all 0.3s;
+}
+
+.world-badge:hover {
+  background: var(--color, #7b2fff);
+  color: #000;
+  transform: translateY(-2px);
+}
+
+/* Controls Info */
+.controls-info {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.ctrl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: rgba(232,232,255,0.7);
+}
+
+kbd {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.3);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  color: #fff;
+}
+
+/* Start Button */
+#start-btn {
+  padding: 18px 60px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #fff;
+  background: linear-gradient(135deg, #7b2fff, #00d4ff);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+  box-shadow: 0 0 30px rgba(123,47,255,0.5);
+}
+
+#start-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #00d4ff, #7b2fff);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+#start-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 50px rgba(123,47,255,0.8), 0 0 80px rgba(0,212,255,0.3);
+}
+
+#start-btn:hover::before { opacity: 1; }
+#start-btn span { position: relative; z-index: 1; }
+
+/* ===================== GAME CANVAS ===================== */
+#game-canvas {
+  display: block;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ===================== HUD ===================== */
+#hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+#hud.hidden { display: none; }
+
+/* World Info */
+#world-info {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50px;
+  padding: 10px 24px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+#world-icon {
+  font-size: 24px;
+}
+
+#world-name {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #fff;
+}
+
+/* Portal Hint */
+#portal-hint {
+  position: absolute;
+  bottom: 160px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: #00d4ff;
+  animation: hintFloat 1s ease-in-out infinite alternate;
+}
+
+#portal-hint.hidden { display: none; }
+
+.hint-arrow {
+  font-size: 24px;
+  animation: arrowBounce 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes hintFloat {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+
+@keyframes arrowBounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-8px); }
+}
+
+/* Minimap */
+#minimap {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  background: rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 8px;
+  backdrop-filter: blur(10px);
+}
+
+#minimap-canvas {
+  display: block;
+  border-radius: 4px;
+}
+
+.minimap-label {
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 6px;
+}
+
+/* Crosshair */
+#crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  color: rgba(255,255,255,0.8);
+  text-shadow: 0 0 10px rgba(0,212,255,0.8);
+  font-weight: 300;
+  pointer-events: none;
+}
+
+/* Controls Overlay */
+#controls-overlay {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#controls-overlay span {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#controls-overlay kbd {
+  font-size: 10px;
+  padding: 2px 6px;
+}
+
+/* ===================== PORTAL OVERLAY ===================== */
+#portal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  background: radial-gradient(circle at center, #7b2fff, #00d4ff, #000);
+}
+
+#portal-overlay.active {
+  animation: portalTransition 1.2s ease-in-out forwards;
+}
+
+@keyframes portalTransition {
+  0% { opacity: 0; transform: scale(0.1); border-radius: 50%; }
+  40% { opacity: 1; transform: scale(1); border-radius: 0%; }
+  60% { opacity: 1; transform: scale(1); border-radius: 0%; }
+  100% { opacity: 0; transform: scale(1); border-radius: 0%; }
+}
+
+/* ===================== PAUSE SCREEN ===================== */
+#pause-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#pause-screen.hidden { display: none; }
+
+.pause-content {
+  text-align: center;
+}
+
+.pause-content h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  background: linear-gradient(135deg, #7b2fff, #00d4ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 40px;
+}
+
+.pause-content button {
+  display: block;
+  width: 220px;
+  margin: 12px auto;
+  padding: 16px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  cursor: pointer;
+  pointer-events: all;
+  transition: all 0.3s;
+}
+
+.pause-content button:hover {
+  background: rgba(123,47,255,0.3);
+  border-color: #7b2fff;
+  transform: translateX(4px);
+}
+
+/* Stars background animation */
+#start-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 70%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 40%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 10%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 60%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 20% 90%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 85%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(2px 2px at 90% 35%, rgba(0,212,255,0.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 15% 55%, rgba(123,47,255,0.5) 0%, transparent 100%);
+  pointer-events: none;
+}

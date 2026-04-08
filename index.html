@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Portal Adventure – Gra 3D</title>
+  <meta name="description" content="Gra 3D – podróż przez portale między 5 światami"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#05050f;color:#e8e8ff;font-family:'Rajdhani',sans-serif;overflow:hidden;height:100vh;width:100vw}
+    #start-screen{position:fixed;inset:0;z-index:1000;background:radial-gradient(ellipse at 50% 40%,#1a0a3e 0%,#050510 70%);display:flex;align-items:center;justify-content:center}
+    .start-content{text-align:center;position:relative;z-index:1;animation:fadeUp .8s ease}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+    .portal-logo{width:120px;height:120px;position:relative;display:flex;align-items:center;justify-content:center;margin:0 auto 24px}
+    .pr{position:absolute;border-radius:50%;border:3px solid transparent;animation:spin linear infinite}
+    .pr1{width:120px;height:120px;border-top-color:#7b2fff;border-right-color:#7b2fff;animation-duration:2s}
+    .pr2{width:90px;height:90px;border-bottom-color:#00d4ff;border-left-color:#00d4ff;animation-duration:1.5s;animation-direction:reverse}
+    .pr3{width:60px;height:60px;border-top-color:#ff6b35;border-right-color:#ff6b35;animation-duration:1s}
+    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    .pi{width:35px;height:35px;border-radius:50%;background:radial-gradient(circle,#00d4ff,#7b2fff);animation:pp 2s ease-in-out infinite;box-shadow:0 0 20px #7b2fff}
+    @keyframes pp{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+    .game-title{font-family:'Orbitron',sans-serif;font-size:52px;font-weight:900;line-height:1.1;background:linear-gradient(135deg,#fff,#00d4ff,#7b2fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;margin-bottom:12px}
+    .game-title span{font-size:36px;letter-spacing:12px}
+    .game-subtitle{font-size:18px;color:rgba(232,232,255,.6);letter-spacing:2px;margin-bottom:28px}
+    .worlds-preview{display:flex;gap:12px;justify-content:center;margin-bottom:28px;flex-wrap:wrap}
+    .wb{padding:8px 16px;border-radius:20px;border:1px solid var(--c);color:var(--c);font-size:14px;font-weight:600;background:rgba(0,0,0,.3);transition:all .3s;cursor:default}
+    .wb:hover{background:var(--c);color:#000;transform:translateY(-2px)}
+    .ctrl-row{display:flex;gap:20px;justify-content:center;margin-bottom:36px;flex-wrap:wrap}
+    .ctrl{display:flex;align-items:center;gap:8px;font-size:15px;color:rgba(232,232,255,.7)}
+    kbd{display:inline-block;padding:3px 8px;border-radius:4px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);font-family:'Orbitron',sans-serif;font-size:11px;color:#fff}
+    #start-btn{padding:18px 60px;font-family:'Orbitron',sans-serif;font-size:17px;font-weight:700;letter-spacing:4px;color:#fff;background:linear-gradient(135deg,#7b2fff,#00d4ff);border:none;border-radius:4px;cursor:pointer;box-shadow:0 0 30px rgba(123,47,255,.5);transition:all .3s}
+    #start-btn:hover{transform:translateY(-3px);box-shadow:0 0 60px rgba(123,47,255,.8)}
+    #game-canvas{display:block;position:fixed;inset:0;width:100vw;height:100vh}
+    #hud{position:fixed;inset:0;pointer-events:none;z-index:100}
+    #hud.hidden{display:none}
+    #world-info{position:absolute;top:24px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);border-radius:50px;padding:10px 28px;font-family:'Orbitron',sans-serif}
+    #world-icon{font-size:24px}
+    #world-name{font-size:15px;font-weight:700;letter-spacing:3px}
+    #portal-hint{position:absolute;bottom:160px;left:50%;transform:translateX(-50%);text-align:center;font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:2px;color:#00d4ff;animation:hf 1s ease-in-out infinite alternate}
+    #portal-hint.hidden{display:none}
+    @keyframes hf{from{opacity:.5}to{opacity:1}}
+    .hint-arrow{font-size:24px;animation:ab .8s ease-in-out infinite alternate}
+    @keyframes ab{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+    #minimap{position:absolute;bottom:24px;right:24px;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px;backdrop-filter:blur(10px)}
+    #minimap-canvas{display:block;border-radius:4px}
+    .mm-label{text-align:center;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:3px;color:rgba(255,255,255,.4);margin-top:6px}
+    #crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:24px;color:rgba(255,255,255,.8);text-shadow:0 0 10px rgba(0,212,255,.8);pointer-events:none}
+    #ctrl-overlay{position:absolute;bottom:24px;left:24px;display:flex;flex-direction:column;gap:6px}
+    #ctrl-overlay span{font-size:13px;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:8px}
+    #portal-overlay{position:fixed;inset:0;z-index:500;pointer-events:none;opacity:0}
+    #portal-overlay.active{animation:pt 1.2s ease-in-out forwards}
+    @keyframes pt{0%{opacity:0;border-radius:50%;transform:scale(0.05)}45%{opacity:1;border-radius:0;transform:scale(1)}65%{opacity:1}100%{opacity:0}}
+    #pause-screen{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.85);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center}
+    #pause-screen.hidden{display:none}
+    .pause-content{text-align:center}
+    .pause-content h2{font-family:'Orbitron',sans-serif;font-size:48px;font-weight:900;letter-spacing:8px;background:linear-gradient(135deg,#7b2fff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:40px}
+    .pause-content button{display:block;width:220px;margin:12px auto;padding:16px;font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;letter-spacing:3px;border:2px solid rgba(255,255,255,.2);border-radius:4px;background:rgba(255,255,255,.05);color:#fff;cursor:pointer;pointer-events:all;transition:all .3s}
+    .pause-content button:hover{background:rgba(123,47,255,.3);border-color:#7b2fff;transform:translateX(5px)}
+    #world-counter{position:absolute;top:24px;right:24px;font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:rgba(255,255,255,.4)}
+  @keyframes dmgFloat{from{transform:translateY(0);opacity:1}to{transform:translateY(-60px);opacity:0}}
+  /* HP Bar */
+  #hp-bar-wrap{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.15);border-radius:40px;padding:8px 20px;backdrop-filter:blur(10px)}
+  #hp-icon{font-size:20px;filter:drop-shadow(0 0 6px #ff2244)}
+  #hp-bar{width:180px;height:10px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden}
+  #hp-fill{height:100%;width:100%;background:#00cc44;border-radius:10px;transition:width .2s,background .3s}
+  #hp-text{font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:1px;color:#fff;min-width:50px}
+  /* Kill Counter */
+  #kill-counter{position:absolute;top:24px;left:24px;font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;color:#ff6600;background:rgba(0,0,0,.6);border:1px solid rgba(255,100,0,.3);border-radius:20px;padding:8px 16px;transition:transform .2s}
+  /* Attack Indicator */
+  #attack-indicator{position:absolute;top:55%;left:50%;transform:translateX(-50%);font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;letter-spacing:3px;opacity:0;transition:opacity .2s;pointer-events:none;text-shadow:0 0 10px currentColor}
+  /* Enemy name / alert */
+  #enemy-alert{position:absolute;top:80px;left:50%;transform:translateX(-50%);font-family:'Orbitron',sans-serif;font-size:13px;color:#ff4400;letter-spacing:3px;opacity:0;transition:opacity .4s;text-shadow:0 0 10px #ff2200}
+  /* Damage overlay */
+  #damage-overlay{position:fixed;inset:0;pointer-events:none;z-index:400;background:radial-gradient(ellipse at center,transparent 40%,#ff000055 100%);opacity:0;transition:opacity .1s}
+  /* Death screen */
+  #death-screen{position:fixed;inset:0;z-index:800;background:rgba(80,0,0,.85);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+  #death-screen.hidden{display:none}
+  #death-screen h2{font-family:'Orbitron',sans-serif;font-size:56px;font-weight:900;letter-spacing:8px;color:#ff2200;text-shadow:0 0 30px #ff0000;animation:pp 1s ease-in-out infinite}
+  #death-screen p{font-family:'Orbitron',sans-serif;font-size:14px;letter-spacing:4px;color:rgba(255,100,100,.8)}
+  /* Attack key hint */
+  .atk-hint{color:#ff8800 !important}
+  </style>
+</head>
+<body>
+
+<div id="start-screen">
+  <div class="start-content">
+    <div class="portal-logo">
+      <div class="pr pr1"></div>
+      <div class="pr pr2"></div>
+      <div class="pr pr3"></div>
+      <div class="pi"></div>
+    </div>
+    <h1 class="game-title">PORTAL<br><span>ADVENTURE</span></h1>
+    <p class="game-subtitle">Podróżuj przez 5 unikalnych światów</p>
+    <div class="worlds-preview">
+      <div class="wb" style="--c:#f4a261">🏛️ Ruiny</div>
+      <div class="wb" style="--c:#52b788">🌲 Las</div>
+      <div class="wb" style="--c:#4361ee">🚀 Kosmos</div>
+      <div class="wb" style="--c:#90e0ef">❄️ Lód</div>
+      <div class="wb" style="--c:#e63946">🌋 Wulkan</div>
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl"><kbd>W A S D</kbd> Ruch</div>
+      <div class="ctrl"><kbd>Mysz</kbd> Kamera</div>
+      <div class="ctrl"><kbd>Shift</kbd> Sprint</div>
+      <div class="ctrl"><kbd>ESC</kbd> Pauza</div>
+    </div>
+    <button id="start-btn">ROZPOCZNIJ PRZYGODĘ</button>
+  </div>
+</div>
+
+<canvas id="game-canvas"></canvas>
+
+<div id="hud" class="hidden">
+  <div id="world-info">
+    <div id="world-icon"></div>
+    <div id="world-name"></div>
+  </div>
+  <div id="world-counter"></div>
+  <div id="portal-hint" class="hidden">
+    <div class="hint-arrow">↑</div>
+    <div>Wejdź w portal!</div>
+  </div>
+  <div id="minimap">
+    <canvas id="minimap-canvas" width="120" height="120"></canvas>
+    <div class="mm-label">MAPA</div>
+  </div>
+  <!-- Combat HUD -->
+  <div id="hp-bar-wrap">
+    <div id="hp-icon">❤</div>
+    <div id="hp-bar"><div id="hp-fill"></div></div>
+    <span id="hp-text">100 HP</span>
+  </div>
+  <div id="kill-counter">☠ 0</div>
+  <div id="attack-indicator"></div>
+  <div id="enemy-alert"></div>
+  <div id="crosshair">+</div>
+  <div id="ctrl-overlay">
+    <span><kbd>WASD</kbd> Ruch</span>
+    <span><kbd>Shift</kbd> Sprint</span>
+    <span class="atk-hint"><kbd>LMB / E</kbd> Atak</span>
+    <span><kbd>ESC</kbd> Pauza</span>
+  </div>
+</div>
+
+<div id="portal-overlay"></div>
+<div id="damage-overlay"></div>
+<div id="death-screen" class="hidden">
+  <h2>POLEGŁEŚ</h2>
+  <p>ODRADZASZ SIĘ...</p>
+</div>
+
+<div id="pause-screen" class="hidden">
+  <div class="pause-content">
+    <h2>PAUZA</h2>
+    <button id="resume-btn">▶ Wznów</button>
+    <button id="menu-btn">🏠 Menu główne</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="enemies.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
