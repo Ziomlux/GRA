@@ -56,8 +56,12 @@ export class AncientRuins extends World {
     scene.add(ground);
 
     // Stone material
-    const stoneMat  = new THREE.MeshStandardMaterial({ color: 0x9e8a70, roughness: 0.9, metalness: 0.05 });
-    const stone2Mat = new THREE.MeshStandardMaterial({ color: 0x7a6a55, roughness: 0.85, metalness: 0.05 });
+    const stoneTex = this.textureLoader.load('./textures/stone.png');
+    stoneTex.wrapS = stoneTex.wrapT = THREE.RepeatWrapping;
+    stoneTex.repeat.set(2, 2);
+    
+    const stoneMat  = new THREE.MeshStandardMaterial({ map: stoneTex, color: 0x9e8a70, roughness: 0.9, metalness: 0.05 });
+    const stone2Mat = new THREE.MeshStandardMaterial({ map: stoneTex, color: 0x7a6a55, roughness: 0.85, metalness: 0.05 });
 
     // --- COLUMNS (circle arrangement) ---
     const columnPositions = [

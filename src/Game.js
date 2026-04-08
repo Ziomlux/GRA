@@ -17,8 +17,9 @@ export class Game {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMapping = THREE.NoToneMapping; // Simplified for stability
     this.renderer.toneMappingExposure = 1.0;
+    this.renderer.setClearColor(0x000000);
 
     this.clock = new THREE.Clock();
     this.running = false;

@@ -12,6 +12,11 @@ export class World {
     this.mapSize = 40;
     this.minimapBg = '#111';
     this.portalColor = '#7b2fff';
+    
+    this.textureLoader = new THREE.TextureLoader();
+    
+    // Add default ambient light as a safety baseline
+    this.scene.add(new THREE.AmbientLight(0xffffff, 0.4));
   }
 
   build() {

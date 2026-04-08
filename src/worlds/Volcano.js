@@ -42,7 +42,12 @@ export class Volcano extends World {
     scene.add(hemi);
 
     // Materials
+    const lavaTex = this.textureLoader.load('./textures/lava.png');
+    lavaTex.wrapS = lavaTex.wrapT = THREE.RepeatWrapping;
+    lavaTex.repeat.set(2, 2);
+
     const lavaMat = new THREE.MeshStandardMaterial({
+      map: lavaTex,
       color: 0xff3300,
       emissive: 0xff2200,
       emissiveIntensity: 1.5,
@@ -50,7 +55,13 @@ export class Volcano extends World {
     });
     const rockMat = new THREE.MeshStandardMaterial({ color: 0x2a1a0a, roughness: 1, metalness: 0 });
     const rockMat2 = new THREE.MeshStandardMaterial({ color: 0x1a0e00, roughness: 1 });
-    const hotRockMat = new THREE.MeshStandardMaterial({ color: 0x3d1500, emissive: 0x660800, emissiveIntensity: 0.8, roughness: 0.9 });
+    const hotRockMat = new THREE.MeshStandardMaterial({ 
+      map: lavaTex,
+      color: 0x3d1500, 
+      emissive: 0x660800, 
+      emissiveIntensity: 0.8, 
+      roughness: 0.9 
+    });
 
     // GROUND – cracked dark rock with lava shaders (use standard + strong emissive)
     const groundGeo = new THREE.PlaneGeometry(50, 50, 30, 30);

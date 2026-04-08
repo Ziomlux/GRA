@@ -35,6 +35,10 @@ export class IceCave extends World {
     scene.add(iceLight3);
 
     // Ground – ice
+    const iceTex = this.textureLoader.load('./textures/ice.png');
+    iceTex.wrapS = iceTex.wrapT = THREE.RepeatWrapping;
+    iceTex.repeat.set(4, 4);
+
     const groundGeo = new THREE.PlaneGeometry(44, 44, 20, 20);
     const pos = groundGeo.attributes.position;
     for (let i = 0; i < pos.count; i++) {
@@ -42,6 +46,7 @@ export class IceCave extends World {
     }
     groundGeo.computeVertexNormals();
     const iceGroundMat = new THREE.MeshStandardMaterial({
+      map: iceTex,
       color: 0x99ccee,
       roughness: 0.05,
       metalness: 0.1,
@@ -53,6 +58,7 @@ export class IceCave extends World {
 
     // Ice crystal material (translucent blue)
     const crystalMat = new THREE.MeshStandardMaterial({
+      map: iceTex,
       color: 0x88ddff,
       emissive: 0x2266aa,
       emissiveIntensity: 0.5,
@@ -62,6 +68,7 @@ export class IceCave extends World {
       opacity: 0.82,
     });
     const crystalMat2 = new THREE.MeshStandardMaterial({
+      map: iceTex,
       color: 0xaaddff,
       emissive: 0x55aadd,
       emissiveIntensity: 0.8,
