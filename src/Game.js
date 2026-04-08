@@ -86,7 +86,24 @@ export class Game {
     this.player.pitch = 0;
     this.player.updateCamera();
 
-    // Spawn enemies
+    // --- Cleanup & Spawn enemies ---
+    // Remove old enemies from scene to prevent duplication lag
+    if (world.enemies && world.enemies.length > 0) {
+      world.enemies.forEach(en => {
+        if (en.mesh) {
+          this.scene.remove(en.mesh);
+          // Proper disposal
+          en.mesh.traverse(obj => {
+            if (obj.isMesh) {
+              obj.geometry.dispose();
+              if (obj.material.map) obj.material.map.dispose();
+              obj.material.dispose();
+            }
+          });
+        }
+      });
+    }
+
     world.enemies = ENEMY.spawnWorldEnemies(this.scene, world.worldType);
   }
 

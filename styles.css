@@ -477,3 +477,9 @@ kbd {
     radial-gradient(2px 2px at 15% 55%, rgba(123,47,255,0.5) 0%, transparent 100%);
   pointer-events: none;
 }
+
+@keyframes dmgFloat {
+  0% { transform: translateY(0) scale(0.5); opacity: 0; }
+  20% { transform: translateY(-10px) scale(1.2); opacity: 1; }
+  100% { transform: translateY(-50px) scale(1); opacity: 0; }
+}

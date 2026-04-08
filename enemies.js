@@ -12,6 +12,11 @@ export const PLR_ATK_CDN   = 0.45;
 export const PLR_ATK_DMG   = 30;
 export const PLR_INV_TIME  = 0.6;
 
+// Reusable vectors/colors to prevent GC thrash
+const _V1 = new THREE.Vector3();
+const _V2 = new THREE.Vector3();
+const _C1 = new THREE.Color();
+
 // ── Mesh wroga z kończynami ───────────────────────────────────
 export function createEnemyMesh(type) {
   const group = new THREE.Group();
@@ -262,14 +267,14 @@ export function updateEnemies(enemies, player, world, dt) {
       ud.hpFill.scale.x = Math.max(0.01, pct);
       ud.hpFill.position.x = -(0.425 * (1 - pct));
       ud.hpFill.material.color.setHex(pct>0.5 ? 0x00cc44 : pct>0.25 ? 0xffaa00 : 0xff2200);
-      if (ud.hpBar) ud.hpBar.lookAt(pp);
+      ud.hpBar.lookAt(pp);
     }
 
     // Hit flash
     const bm = ud.bodyMat;
     if (en.hitFlash > 0) {
       en.hitFlash -= dt;
-      if (bm) { bm.emissive = new THREE.Color(1,1,1); bm.emissiveIntensity = 5; }
+      if (bm) { bm.emissive.setHex(0xffffff); bm.emissiveIntensity = 5; }
     } else {
       if (bm) bm.emissiveIntensity = 0;
     }
@@ -293,15 +298,15 @@ export function updateEnemies(enemies, player, world, dt) {
           THREE.MathUtils.clamp(en.spawnPos.z+Math.sin(a)*r,-half,half));
         en.patrolTimer = 2.5 + Math.random()*4;
       }
-      const dir = new THREE.Vector3().subVectors(en.patrolTarget, en.mesh.position); dir.y=0;
+      const dir = _V1.subVectors(en.patrolTarget, en.mesh.position); dir.y=0;
       if (dir.length() > 0.5) {
-        const step = dir.clone().normalize().multiplyScalar(en.speed*0.4*dt);
+        const step = _V2.copy(dir).normalize().multiplyScalar(en.speed*0.4*dt);
         en.mesh.position.add(step);
         en.mesh.lookAt(en.mesh.position.x+step.x, en.mesh.position.y, en.mesh.position.z+step.z);
         moving = true;
       }
     } else if (en.state === 'chase') {
-      const dir = new THREE.Vector3().subVectors(pp, en.mesh.position); dir.y=0; dir.normalize();
+      const dir = _V1.subVectors(pp, en.mesh.position); dir.y=0; dir.normalize();
       en.mesh.lookAt(pp.x, en.mesh.position.y, pp.z);
       en.mesh.position.addScaledVector(dir, en.speed*dt);
       en.mesh.position.x = THREE.MathUtils.clamp(en.mesh.position.x,-half,half);
