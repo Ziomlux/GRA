@@ -12,6 +12,8 @@ export class World {
     this.mapSize = 40;
     this.minimapBg = '#111';
     this.portalColor = '#7b2fff';
+    this.enemies = [];
+    this.worldType = 'ruins'; // Default type for enemy spawning
     
     this.textureLoader = new THREE.TextureLoader();
     

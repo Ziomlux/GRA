@@ -10,6 +10,7 @@ export class MistyForest extends World {
     this.portalColor = '#52b788';
     this.minimapBg = '#0a1a0d';
     this.mapSize = 50;
+    this.worldType = 'forest';
     this._index = index;
     this._total = total;
     this.build();

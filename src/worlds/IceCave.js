@@ -10,6 +10,7 @@ export class IceCave extends World {
     this.portalColor = '#90e0ef';
     this.minimapBg = '#050d1a';
     this.mapSize = 44;
+    this.worldType = 'ice';
     this._index = index;
     this._total = total;
     this.build();

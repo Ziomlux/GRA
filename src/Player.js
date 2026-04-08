@@ -13,6 +13,15 @@ export class Player {
     this.keys = {};
     this.velocity = new THREE.Vector3();
 
+    // Combat state
+    this.hp = 100;
+    this.maxHp = 100;
+    this.kills = 0;
+    this.attackCooldown = 0;
+    this.invincible = 0;
+    this._wantsAttack = false;
+    this._isMoving = false;
+
     this._onMouseMove = this._onMouseMove.bind(this);
     this._onClick = this._onClick.bind(this);
   }
@@ -68,8 +77,10 @@ export class Player {
     if (this.keys['KeyS'] || this.keys['ArrowDown']) move.sub(forward);
     if (this.keys['KeyA'] || this.keys['ArrowLeft']) move.sub(right);
     if (this.keys['KeyD'] || this.keys['ArrowRight']) move.add(right);
+    
+    this._isMoving = move.lengthSq() > 0;
 
-    if (move.lengthSq() > 0) {
+    if (this._isMoving) {
       move.normalize().multiplyScalar(spd * delta);
       const newPos = this.camera.position.clone().add(move);
 

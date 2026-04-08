@@ -10,6 +10,7 @@ export class Volcano extends World {
     this.portalColor = '#e63946';
     this.minimapBg = '#1a0500';
     this.mapSize = 50;
+    this.worldType = 'volcano';
     this._index = index;
     this._total = total;
     this._embers = [];

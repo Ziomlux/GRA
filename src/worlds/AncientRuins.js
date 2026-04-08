@@ -10,6 +10,7 @@ export class AncientRuins extends World {
     this.portalColor = '#f4a261';
     this.minimapBg = '#2d1a0a';
     this.mapSize = 50;
+    this.worldType = 'ruins';
     this._index = index;
     this._total = total;
     this.build();

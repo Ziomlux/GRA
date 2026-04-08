@@ -1,17 +1,20 @@
 'use strict';
+import * as THREE from 'three';
+
 // ============================================================
 //  ENEMIES.JS v2 – AI + animowane postacie (nogi, ręce, broń)
 // ============================================================
-const DETECT_RANGE  = 16;
-const ATTACK_RANGE  = 2.4;
-const ATK_COOLDOWN  = 1.5;
-const PLR_ATK_RANGE = 3.2;
-const PLR_ATK_CDN   = 0.45;
-const PLR_ATK_DMG   = 30;
+export const DETECT_RANGE  = 16;
+export const ATTACK_RANGE  = 2.4;
+export const ATK_COOLDOWN  = 1.5;
+export const PLR_ATK_RANGE = 3.2;
+export const PLR_ATK_CDN   = 0.45;
+export const PLR_ATK_DMG   = 30;
+export const PLR_INV_TIME  = 0.6;
 const PLR_INV_TIME  = 0.6;
 
 // ── Mesh wroga z kończynami ───────────────────────────────────
-function createEnemyMesh(type) {
+export function createEnemyMesh(type) {
   const group = new THREE.Group();
   const T = {
     golem:     { bc:0x8a7560, ac:0x9a8570, ec:0xff7700, bh:1.3, bw:0.85, sphere:false, scale:1.0 },
@@ -166,7 +169,7 @@ const WORLD_ENEMIES = {
   ],
 };
 
-function spawnWorldEnemies(scene, worldType) {
+export function spawnWorldEnemies(scene, worldType) {
   return (WORLD_ENEMIES[worldType] || []).map(cfg => {
     const mesh = createEnemyMesh(cfg.type);
     mesh.position.set(cfg.pos[0], 0, cfg.pos[2]);
@@ -240,7 +243,7 @@ function animateLimbs(en, dt, moving) {
 }
 
 // ── AI wrogów ─────────────────────────────────────────────────
-function updateEnemies(enemies, player, world, dt) {
+export function updateEnemies(enemies, player, world, dt) {
   const pp   = player.camera.position;
   const half = (world.mapSize || 40) / 2 - 2;
 
@@ -318,7 +321,7 @@ function updateEnemies(enemies, player, world, dt) {
 }
 
 // ── Broń gracza (viewmodel) ───────────────────────────────────
-function createWeaponScene() {
+export function createWeaponScene() {
   const scene = new THREE.Scene();
   scene.add(new THREE.AmbientLight(0xffffff, 3));
   const dirL = new THREE.DirectionalLight(0xffffff, 2);
@@ -374,7 +377,7 @@ let _wpnBob = 0, _wpnAttackAnim = 0, _wpnAttacking = false;
 let _wpnSwayX = 0, _wpnSwayY = 0;
 let _prevMouseDX = 0, _prevMouseDY = 0;
 
-function updateWeapon(weapon, player, dt, isMoving, isAttacking) {
+export function updateWeapon(weapon, player, dt, isMoving, isAttacking) {
   const t = Date.now() * 0.001;
   const base = weapon.mesh;
 
@@ -419,13 +422,13 @@ function updateWeapon(weapon, player, dt, isMoving, isAttacking) {
   );
 }
 
-function triggerWeaponAttack() {
+export function triggerWeaponAttack() {
   _wpnAttacking = true;
   _wpnAttackAnim = 0;
 }
 
 // ── Walka gracza ──────────────────────────────────────────────
-function initPlayerCombat(player, canvas) {
+export function initPlayerCombat(player, canvas) {
   player.hp = 100; player.maxHp = 100;
   player.attackCooldown = 0; player.invincible = 0;
   player.kills = 0; player._wantsAttack = false;
@@ -439,7 +442,7 @@ function initPlayerCombat(player, canvas) {
   });
 }
 
-function handlePlayerAttack(enemies, player, dt, weapon) {
+export function handlePlayerAttack(enemies, player, dt, weapon) {
   if (player.attackCooldown > 0) player.attackCooldown -= dt;
   if (player.invincible > 0)     player.invincible -= dt;
   if (!player._wantsAttack) return;
@@ -477,7 +480,7 @@ function handlePlayerAttack(enemies, player, dt, weapon) {
   flashCrosshair(hit);
 }
 
-function damagePlayer(player, dmg) {
+export function damagePlayer(player, dmg) {
   if (player.invincible>0) return;
   player.invincible = PLR_INV_TIME;
   player.hp = Math.max(0, player.hp-dmg);

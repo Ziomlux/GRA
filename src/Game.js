@@ -5,6 +5,7 @@ import { MistyForest } from './worlds/MistyForest.js';
 import { SpaceStation } from './worlds/SpaceStation.js';
 import { IceCave } from './worlds/IceCave.js';
 import { Volcano } from './worlds/Volcano.js';
+import * as ENEMY from '../enemies.js';
 
 export class Game {
   constructor() {
@@ -13,6 +14,7 @@ export class Game {
       canvas: this.canvas,
       antialias: true,
     });
+    this.renderer.autoClear = false; // Required for weapon overlay
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.shadowMap.enabled = true;
@@ -33,6 +35,13 @@ export class Game {
     // Player
     this.player = new Player(this);
 
+    // Combat
+    this.weaponScene = ENEMY.createWeaponScene();
+    this.weaponCam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 10);
+
+    // Initial HUD update
+    ENEMY.updateHPBar(this.player);
+
     // Minimap
     this.minimapCanvas = document.getElementById('minimap-canvas');
     this.minimapCtx = this.minimapCanvas.getContext('2d');
@@ -50,6 +59,7 @@ export class Game {
 
     this.loadWorld(0);
     this.player.enable();
+    ENEMY.initPlayerCombat(this.player, this.canvas);
     this.running = true;
     this.animate();
   }
@@ -75,6 +85,9 @@ export class Game {
     this.player.yaw = (fromPortalDir === 'prev') ? Math.PI : 0;
     this.player.pitch = 0;
     this.player.updateCamera();
+
+    // Spawn enemies
+    world.enemies = ENEMY.spawnWorldEnemies(this.scene, world.worldType);
   }
 
   animate() {
@@ -86,11 +99,17 @@ export class Game {
     if (!this.paused && !this.transitioning) {
       this.player.update(delta);
       this.worlds[this.currentWorldIndex].update(delta);
+      ENEMY.updateEnemies(this.worlds[this.currentWorldIndex].enemies, this.player, this.worlds[this.currentWorldIndex], delta);
+      ENEMY.handlePlayerAttack(this.worlds[this.currentWorldIndex].enemies, this.player, delta, this.weaponScene);
+      ENEMY.updateWeapon(this.weaponScene, this.player, delta, this.player._isMoving, this.player._wantsAttack);
       this.checkPortalCollisions();
       this.drawMinimap();
     }
 
+    this.renderer.clear();
     this.renderer.render(this.scene, this.player.camera);
+    this.renderer.clearDepth();
+    this.renderer.render(this.weaponScene.scene, this.weaponCam);
   }
 
   checkPortalCollisions() {
@@ -221,5 +240,7 @@ export class Game {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.player.camera.aspect = window.innerWidth / window.innerHeight;
     this.player.camera.updateProjectionMatrix();
+    this.weaponCam.aspect = window.innerWidth / window.innerHeight;
+    this.weaponCam.updateProjectionMatrix();
   }
 }
