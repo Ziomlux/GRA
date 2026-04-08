@@ -495,7 +495,7 @@ export function damagePlayer(player, dmg) {
   }
 }
 
-function updateHPBar(player) {
+export function updateHPBar(player) {
   const fill = document.getElementById('hp-fill');
   const text = document.getElementById('hp-text');
   if (!fill) return;
@@ -505,7 +505,7 @@ function updateHPBar(player) {
   if (text) text.textContent = Math.ceil(player.hp)+' HP';
 }
 
-function updateKillCount(kills) {
+export function updateKillCount(kills) {
   const el = document.getElementById('kill-counter');
   if (!el) return;
   el.textContent='☠ '+kills;
@@ -513,7 +513,7 @@ function updateKillCount(kills) {
   setTimeout(()=>el.style.transform='scale(1)', 250);
 }
 
-function showAttackFeedback(type) {
+export function showAttackFeedback(type) {
   const el = document.getElementById('attack-indicator');
   if (!el) return;
   el.textContent = type==='hit'?'⚔ HIT!':type==='miss'?'✗ MISS':'⏳';
@@ -522,7 +522,7 @@ function showAttackFeedback(type) {
   setTimeout(()=>el.style.opacity='0', 600);
 }
 
-function flashCrosshair(hit) {
+export function flashCrosshair(hit) {
   const el = document.getElementById('crosshair');
   if (!el) return;
   el.style.color = hit?'#ff4400':'rgba(255,255,255,0.8)';
@@ -530,7 +530,7 @@ function flashCrosshair(hit) {
   setTimeout(()=>{ el.style.color='rgba(255,255,255,0.8)'; el.style.transform='translate(-50%,-50%)'; }, 200);
 }
 
-function spawnDmgNumber(amount) {
+export function spawnDmgNumber(amount) {
   const el = document.createElement('div');
   el.textContent = '-'+amount;
   el.style.cssText = `position:fixed;left:${42+Math.random()*16}%;top:${35+Math.random()*12}%;`
