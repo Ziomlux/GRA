@@ -11,7 +11,6 @@ export const PLR_ATK_RANGE = 3.2;
 export const PLR_ATK_CDN   = 0.45;
 export const PLR_ATK_DMG   = 30;
 export const PLR_INV_TIME  = 0.6;
-const PLR_INV_TIME  = 0.6;
 
 // ── Mesh wroga z kończynami ───────────────────────────────────
 export function createEnemyMesh(type) {
