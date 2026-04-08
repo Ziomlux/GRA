@@ -233,7 +233,7 @@ export class Volcano extends World {
       color: '#90e0ef',
       targetWorldIndex: 3,
       direction: 'next',
-      exitPosition: new THREE.Vector3(0, 1.7, -16),
+      exitPosition: new THREE.Vector3(0, 1.7, 14),
     });
     this.portals.push(prev);
 
@@ -243,7 +243,7 @@ export class Volcano extends World {
       color: '#f4a261',
       targetWorldIndex: 0,
       direction: 'prev',
-      exitPosition: new THREE.Vector3(0, 1.7, 16),
+      exitPosition: new THREE.Vector3(0, 1.7, -14),
     });
     this.portals.push(next);
   }

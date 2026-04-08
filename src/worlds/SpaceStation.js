@@ -182,7 +182,7 @@ export class SpaceStation extends World {
       color: '#52b788',
       targetWorldIndex: 1,
       direction: 'next',
-      exitPosition: new THREE.Vector3(0, 1.7, -16),
+      exitPosition: new THREE.Vector3(0, 1.7, 13),
     });
     this.portals.push(prev);
 
@@ -192,7 +192,7 @@ export class SpaceStation extends World {
       color: '#90e0ef',
       targetWorldIndex: 3,
       direction: 'prev',
-      exitPosition: new THREE.Vector3(0, 1.7, 16),
+      exitPosition: new THREE.Vector3(0, 1.7, -13),
     });
     this.portals.push(next);
   }

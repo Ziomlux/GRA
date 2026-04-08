@@ -160,7 +160,7 @@ export class AncientRuins extends World {
       color: '#52b788',
       targetWorldIndex: 1,
       direction: 'prev',
-      exitPosition: new THREE.Vector3(0, 1.7, 16),
+      exitPosition: new THREE.Vector3(0, 1.7, -13),
     });
     this.portals.push(next);
   }

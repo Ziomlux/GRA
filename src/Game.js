@@ -77,8 +77,8 @@ export class Game {
 
     // Place player at world spawn (or opposite portal if coming through)
     const spawnPos = (fromPortalDir === 'prev')
-      ? world.portals[world.portals.length - 1]?.exitPosition?.clone() || new THREE.Vector3(0, 1.7, -8)
-      : world.portals[0]?.exitPosition?.clone() || new THREE.Vector3(0, 1.7, 8);
+      ? world.portals[0]?.exitPosition?.clone() || new THREE.Vector3(0, 1.7, 14)
+      : world.portals[world.portals.length - 1]?.exitPosition?.clone() || new THREE.Vector3(0, 1.7, -14);
 
     spawnPos.y = 1.7;
     this.player.camera.position.copy(spawnPos);

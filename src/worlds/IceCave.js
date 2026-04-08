@@ -191,7 +191,7 @@ export class IceCave extends World {
       color: '#4361ee',
       targetWorldIndex: 2,
       direction: 'next',
-      exitPosition: new THREE.Vector3(0, 1.7, -16),
+      exitPosition: new THREE.Vector3(0, 1.7, 14),
     });
     this.portals.push(prev);
 
@@ -201,7 +201,7 @@ export class IceCave extends World {
       color: '#e63946',
       targetWorldIndex: 4,
       direction: 'prev',
-      exitPosition: new THREE.Vector3(0, 1.7, 16),
+      exitPosition: new THREE.Vector3(0, 1.7, -14),
     });
     this.portals.push(next);
   }
