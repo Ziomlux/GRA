@@ -11,6 +11,7 @@ export class MistyForest extends World {
     this.minimapBg = '#0a1a0d';
     this.mapSize = 50;
     this.worldType = 'forest';
+    this.xpReward = 20;
     this._index = index;
     this._total = total;
     this.build();

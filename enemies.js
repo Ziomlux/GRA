@@ -247,9 +247,10 @@ function animateLimbs(en, dt, moving) {
 }
 
 // ── AI wrogów ─────────────────────────────────────────────────
-export function updateEnemies(enemies, player, world, dt) {
+export function updateEnemies(enemies, player, world, dt, loop = 0) {
   const pp   = player.camera.position;
   const half = (world.mapSize || 40) / 2 - 2;
+  const loopScale = 1 + (loop * 0.5);
 
   enemies.forEach(en => {
     if (!en.alive) {
@@ -259,6 +260,10 @@ export function updateEnemies(enemies, player, world, dt) {
       if (en.deathTimer > 2.5) en.mesh.visible = false;
       return;
     }
+
+    // Scale attributes once if needed, or use multiplier
+    const speed = en.speed * loopScale;
+    const atk = en.atk * loopScale;
 
     // HP bar – billboard
     const ud = en.mesh.userData;
@@ -300,7 +305,7 @@ export function updateEnemies(enemies, player, world, dt) {
       }
       const dir = _V1.subVectors(en.patrolTarget, en.mesh.position); dir.y=0;
       if (dir.length() > 0.5) {
-        const step = _V2.copy(dir).normalize().multiplyScalar(en.speed*0.4*dt);
+        const step = _V2.copy(dir).normalize().multiplyScalar(speed*0.4*dt);
         en.mesh.position.add(step);
         en.mesh.lookAt(en.mesh.position.x+step.x, en.mesh.position.y, en.mesh.position.z+step.z);
         moving = true;
@@ -308,7 +313,7 @@ export function updateEnemies(enemies, player, world, dt) {
     } else if (en.state === 'chase') {
       const dir = _V1.subVectors(pp, en.mesh.position); dir.y=0; dir.normalize();
       en.mesh.lookAt(pp.x, en.mesh.position.y, pp.z);
-      en.mesh.position.addScaledVector(dir, en.speed*dt);
+      en.mesh.position.addScaledVector(dir, speed*dt);
       en.mesh.position.x = THREE.MathUtils.clamp(en.mesh.position.x,-half,half);
       en.mesh.position.z = THREE.MathUtils.clamp(en.mesh.position.z,-half,half);
       moving = true;
@@ -316,7 +321,7 @@ export function updateEnemies(enemies, player, world, dt) {
       en.mesh.lookAt(pp.x, en.mesh.position.y, pp.z);
       if (en.attackCooldown <= 0) {
         en.attackCooldown = ATK_COOLDOWN;
-        if (dist < ATTACK_RANGE+0.6) damagePlayer(player, en.damage);
+        if (dist < ATTACK_RANGE+0.6) damagePlayer(player, atk);
       }
     }
 
@@ -446,36 +451,42 @@ export function initPlayerCombat(player, canvas) {
   });
 }
 
-export function handlePlayerAttack(enemies, player, dt, weapon) {
+export function handlePlayerAttack(enemies, player, world, dt, weapon) {
+  const agilityBonus = (player.agility - 1) * 0.5;
   if (player.attackCooldown > 0) player.attackCooldown -= dt;
   if (player.invincible > 0)     player.invincible -= dt;
+  
   if (!player._wantsAttack) return;
   player._wantsAttack = false;
 
   if (player.attackCooldown > 0) { showAttackFeedback('cooldown'); return; }
-  player.attackCooldown = PLR_ATK_CDN;
+  player.attackCooldown = PLR_ATK_CDN / (1 + agilityBonus);
 
   if (weapon) triggerWeaponAttack();
 
   const pp  = player.camera.position;
-  const fwd = new THREE.Vector3(-Math.sin(player.yaw), 0, -Math.cos(player.yaw));
+  const fwd = _V1.set(-Math.sin(player.yaw), 0, -Math.cos(player.yaw));
   let hit = false;
 
   enemies.forEach(en => {
     if (!en.alive) return;
     const dist = en.mesh.position.distanceTo(pp);
     if (dist > PLR_ATK_RANGE) return;
-    const toEn = new THREE.Vector3().subVectors(en.mesh.position, pp); toEn.y=0; toEn.normalize();
+    const toEn = _V2.subVectors(en.mesh.position, pp); toEn.y=0; toEn.normalize();
     if (fwd.dot(toEn) < 0.2) return;
 
-    en.hp -= PLR_ATK_DMG; en.hitFlash = 0.25; hit = true;
-    spawnDmgNumber(PLR_ATK_DMG);
+    const dmg = PLR_ATK_DMG * player.strength;
+    en.hp -= dmg; en.hitFlash = 0.25; hit = true;
+    spawnDmgNumber(Math.ceil(dmg));
 
     if (en.hp <= 0) {
       en.alive=false; en.state='dead'; en.deathTimer=0;
       player.kills++;
-      player.hp = Math.min(player.maxHp, player.hp+8);
+      player.hp = Math.min(player.maxHp, player.hp + 5 + (player.vitality * 3));
+      player.gainXp(world.xpReward);
       updateKillCount(player.kills);
+      updateXPBar(player);
+      updateHPBar(player);
     }
   });
 
@@ -506,7 +517,16 @@ export function updateHPBar(player) {
   const pct = player.hp / player.maxHp * 100;
   fill.style.width = pct+'%';
   fill.style.background = pct>60?'#00cc44':pct>30?'#ffaa00':'#ff2200';
-  if (text) text.textContent = Math.ceil(player.hp)+' HP';
+  if (text) text.textContent = Math.ceil(player.hp)+' / '+player.maxHp+' HP';
+}
+
+export function updateXPBar(player) {
+  const fill = document.getElementById('xp-fill');
+  const text = document.getElementById('xp-text');
+  if (!fill) return;
+  const pct = (player.xp / player.xpToNextLevel) * 100;
+  fill.style.width = pct + '%';
+  if (text) text.textContent = 'Lvl ' + player.level;
 }
 
 export function updateKillCount(kills) {

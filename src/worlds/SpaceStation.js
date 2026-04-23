@@ -11,6 +11,7 @@ export class SpaceStation extends World {
     this.minimapBg = '#05050f';
     this.mapSize = 40;
     this.worldType = 'space';
+    this.xpReward = 35;
     this._index = index;
     this._total = total;
     this.build();

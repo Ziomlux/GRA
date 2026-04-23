@@ -13,10 +13,20 @@ export class Player {
     this.keys = {};
     this.velocity = new THREE.Vector3();
 
-    // Combat state
+    // Combat & RPG state
     this.hp = 100;
     this.maxHp = 100;
     this.kills = 0;
+    this.level = 1;
+    this.xp = 0;
+    this.xpToNextLevel = 100;
+    this.statPoints = 0;
+    
+    // Attributes
+    this.strength = 1; // Damage multiplier
+    this.vitality = 1; // Health bonus
+    this.agility  = 1; // Speed & Cooldown bonus
+
     this.attackCooldown = 0;
     this.invincible = 0;
     this._wantsAttack = false;
@@ -133,5 +143,45 @@ export class Player {
     // Lock height to ground
     this.camera.position.y = 1.7;
     this.updateCamera();
+  }
+
+  gainXp(amount) {
+    this.xp += amount;
+    if (this.xp >= this.xpToNextLevel) {
+      this.levelUp();
+    }
+  }
+
+  levelUp() {
+    this.level++;
+    this.xp -= this.xpToNextLevel;
+    this.xpToNextLevel = Math.floor(100 * Math.pow(this.level, 1.5));
+    this.statPoints += 2;
+    
+    // Heal on level up
+    this.hp = this.maxHp;
+    
+    // HUD visual feedback
+    const el = document.getElementById('level-up-notif');
+    if (el) {
+      el.classList.remove('hidden');
+      setTimeout(() => el.classList.add('hidden'), 3000);
+    }
+  }
+
+  upgradeStat(name) {
+    if (this.statPoints <= 0) return false;
+    
+    if (name === 'strength') this.strength += 0.2;
+    else if (name === 'vitality') {
+      this.vitality += 1;
+      this.maxHp += 20;
+      this.hp += 20;
+    }
+    else if (name === 'agility') this.agility += 0.15;
+    else return false;
+
+    this.statPoints--;
+    return true;
   }
 }

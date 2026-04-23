@@ -11,6 +11,7 @@ export class Volcano extends World {
     this.minimapBg = '#1a0500';
     this.mapSize = 50;
     this.worldType = 'volcano';
+    this.xpReward = 90;
     this._index = index;
     this._total = total;
     this._embers = [];
@@ -246,5 +247,27 @@ export class Volcano extends World {
       exitPosition: new THREE.Vector3(0, 1.7, -14),
     });
     this.portals.push(next);
+
+    // --- SECRET LOOP PORTAL (NG+) ---
+    const secret = createPortal({
+      position: new THREE.Vector3(18, 1.6, 0),
+      color: '#000000', // Black hole look
+      targetWorldIndex: 0,
+      direction: 'prev',
+      exitPosition: new THREE.Vector3(0, 1.7, 14),
+    });
+    secret.mesh.userData.isLoopPortal = true;
+    // Add a glowing rim for the secret portal
+    const rimGeo = new THREE.TorusGeometry(2.6, 0.05, 16, 100);
+    const rimMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    const rim = new THREE.Mesh(rimGeo, rimMat);
+    secret.mesh.add(rim);
+
+    this.portals.push(secret);
+
+    // Add some rocks to "hide" it partially
+    const rockMat = new THREE.MeshStandardMaterial({ color: 0x221100 });
+    this.addBox(this.scene, 16, 0, 3, 3, 5, 2, rockMat);
+    this.addBox(this.scene, 16, 0, -3, 3, 5, 2, rockMat);
   }
 }

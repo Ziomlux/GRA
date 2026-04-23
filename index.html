@@ -111,6 +111,79 @@
   </div>
 </div>
 
+<div id="level-up-notif" class="hidden">
+  <div class="lvl-up-content">
+    <h3>AWANS!</h3>
+    <p>Otrzymałeś punkty statystyk</p>
+  </div>
+</div>
+
+<div id="inventory-overlay" class="hidden">
+  <div class="inv-content">
+    <div class="inv-header">
+      <div class="inv-tab active" data-tab="stats">STATYSTYKI</div>
+      <div class="inv-tab" data-tab="items">PRZEDMIOTY</div>
+      <div id="close-inv">×</div>
+    </div>
+    
+    <div id="tab-stats" class="tab-pane active">
+      <div class="stats-grid">
+        <div class="stat-row">
+          <div class="stat-info">
+            <span class="stat-label">POZIOM</span>
+            <span id="st-level" class="stat-value">1</span>
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-info">
+            <span class="stat-label">PUNKTY</span>
+            <span id="st-points" class="stat-value">0</span>
+          </div>
+        </div>
+        <hr>
+        <div class="stat-row">
+          <div class="stat-info">
+            <span class="stat-label">SIŁA (Atak)</span>
+            <span id="st-strength" class="stat-value">1.0</span>
+          </div>
+          <button class="upgrade-btn" data-stat="strength">+</button>
+        </div>
+        <div class="stat-row">
+          <div class="stat-info">
+            <span class="stat-label">WIT (Zdrowie)</span>
+            <span id="st-vitality" class="stat-value">1</span>
+          </div>
+          <button class="upgrade-btn" data-stat="vitality">+</button>
+        </div>
+        <div class="stat-row">
+          <div class="stat-info">
+            <span class="stat-label">ZRE (Szybkość)</span>
+            <span id="st-agility" class="stat-value">1.0</span>
+          </div>
+          <button class="upgrade-btn" data-stat="agility">+</button>
+        </div>
+        <hr>
+        <div class="stat-row">
+          <div class="stat-info">
+            <span class="stat-label">ZDROWIE</span>
+            <span id="st-hp" class="stat-value">100 / 100</span>
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-info">
+            <span class="stat-label">EXP</span>
+            <span id="st-xp" class="stat-value">0 / 100</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="tab-items" class="tab-pane">
+       <div class="placeholder-text">Twoja torba jest pusta...</div>
+    </div>
+  </div>
+</div>
+
 <canvas id="game-canvas"></canvas>
 
 <div id="hud" class="hidden">
@@ -132,6 +205,11 @@
     <div id="hp-icon">❤</div>
     <div id="hp-bar"><div id="hp-fill"></div></div>
     <span id="hp-text">100 HP</span>
+  </div>
+  <div id="xp-bar-wrap">
+    <div id="xp-icon">⚡</div>
+    <div id="xp-bar"><div id="xp-fill"></div></div>
+    <span id="xp-text">Lvl 1</span>
   </div>
   <div id="kill-counter">☠ 0</div>
   <div id="attack-indicator"></div>

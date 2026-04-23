@@ -27,6 +27,8 @@ export class Game {
     this.running = false;
     this.transitioning = false;
     this.currentWorldIndex = 0;
+    this.difficultyLoop = 0; // NG+ level
+    this.inventoryOpen = false;
 
     // Build worlds list
     this.worldClasses = [AncientRuins, MistyForest, SpaceStation, IceCave, Volcano];
@@ -60,8 +62,37 @@ export class Game {
     this.loadWorld(0);
     this.player.enable();
     ENEMY.initPlayerCombat(this.player, this.canvas);
+    this.setupUIListeners();
     this.running = true;
     this.animate();
+  }
+
+  setupUIListeners() {
+    // Inventory tabs
+    document.querySelectorAll('.inv-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.inv-tab, .tab-pane').forEach(el => el.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Close btn
+    document.getElementById('close-inv').addEventListener('click', () => this.toggleInventory());
+
+    // Upgrade buttons
+    document.querySelectorAll('.upgrade-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (this.player.upgradeStat(btn.dataset.stat)) {
+          this.updateStatsUI();
+          ENEMY.updateHPBar(this.player);
+          ENEMY.updateXPBar(this.player);
+          // Visual feedback on button
+          btn.style.background = '#00d4ff';
+          setTimeout(() => btn.style.background = '', 200);
+        }
+      });
+    });
   }
 
   loadWorld(index, fromPortalDir) {
@@ -116,8 +147,9 @@ export class Game {
     if (!this.paused && !this.transitioning) {
       this.player.update(delta);
       this.worlds[this.currentWorldIndex].update(delta);
-      ENEMY.updateEnemies(this.worlds[this.currentWorldIndex].enemies, this.player, this.worlds[this.currentWorldIndex], delta);
-      ENEMY.handlePlayerAttack(this.worlds[this.currentWorldIndex].enemies, this.player, delta, this.weaponScene);
+      const world = this.worlds[this.currentWorldIndex];
+      ENEMY.updateEnemies(world.enemies, this.player, world, delta, this.difficultyLoop);
+      ENEMY.handlePlayerAttack(world.enemies, this.player, world, delta, this.weaponScene);
       ENEMY.updateWeapon(this.weaponScene, this.player, delta, this.player._isMoving, this.player._wantsAttack);
       this.checkPortalCollisions();
       this.drawMinimap();
@@ -138,7 +170,11 @@ export class Game {
       const dist = playerPos.distanceTo(portal.mesh.position);
       if (dist < 2.5) nearAny = true;
       if (dist < 1.4 && !this.transitioning) {
-        this.triggerPortalTransition(portal.targetWorldIndex, portal.direction);
+        if (portal.mesh.userData.isLoopPortal) {
+          this.triggerNextLoop();
+        } else {
+          this.triggerPortalTransition(portal.targetWorldIndex, portal.direction);
+        }
         return;
       }
     }
@@ -237,6 +273,12 @@ export class Game {
         this.paused ? this.resume() : this.pause();
       }
     }
+    if (e.code === 'Tab' || e.code === 'KeyI') {
+      if (this.running && !this.paused) {
+        e.preventDefault();
+        this.toggleInventory();
+      }
+    }
   }
 
   pause() {
@@ -249,8 +291,53 @@ export class Game {
   resume() {
     this.paused = false;
     document.getElementById('pause-screen').classList.add('hidden');
-    this.player.enable();
-    this.canvas.requestPointerLock();
+    if (!this.inventoryOpen) {
+      this.player.enable();
+      this.canvas.requestPointerLock();
+    }
+  }
+
+  toggleInventory() {
+    this.inventoryOpen = !this.inventoryOpen;
+    const inv = document.getElementById('inventory-overlay');
+    if (this.inventoryOpen) {
+      inv.classList.remove('hidden');
+      this.player.disable();
+      document.exitPointerLock?.();
+      this.updateStatsUI();
+    } else {
+      inv.classList.add('hidden');
+      this.player.enable();
+      this.canvas.requestPointerLock();
+    }
+  }
+
+  updateStatsUI() {
+    const p = this.player;
+    document.getElementById('st-level').textContent = p.level;
+    document.getElementById('st-points').textContent = p.statPoints;
+    document.getElementById('st-strength').textContent = p.strength.toFixed(1);
+    document.getElementById('st-vitality').textContent = p.vitality;
+    document.getElementById('st-agility').textContent = p.agility.toFixed(2);
+    document.getElementById('st-hp').textContent = `${Math.ceil(p.hp)} / ${p.maxHp}`;
+    document.getElementById('st-xp').textContent = `${p.xp} / ${p.xpToNextLevel}`;
+  }
+
+  triggerNextLoop() {
+    this.difficultyLoop++;
+    const overlay = document.getElementById('portal-overlay');
+    overlay.classList.add('active');
+    this.transitioning = true;
+    
+    setTimeout(() => {
+      this.loadWorld(0);
+      overlay.classList.remove('active');
+      this.transitioning = false;
+      
+      // HUD Loop indicators (optional)
+      const ni = document.getElementById('world-name');
+      ni.textContent += ` (LOOP ${this.difficultyLoop})`;
+    }, 1200);
   }
 
   onResize() {

@@ -7,10 +7,8 @@ export class AncientRuins extends World {
     super();
     this.name = 'RUINY STAROŻYTNE';
     this.icon = '🏛️';
-    this.portalColor = '#f4a261';
-    this.minimapBg = '#2d1a0a';
-    this.mapSize = 50;
     this.worldType = 'ruins';
+    this.xpReward = 10;
     this._index = index;
     this._total = total;
     this.build();

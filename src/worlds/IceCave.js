@@ -11,6 +11,7 @@ export class IceCave extends World {
     this.minimapBg = '#050d1a';
     this.mapSize = 44;
     this.worldType = 'ice';
+    this.xpReward = 55;
     this._index = index;
     this._total = total;
     this.build();
