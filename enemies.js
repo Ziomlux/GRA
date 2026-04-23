@@ -12,6 +12,92 @@ export const PLR_ATK_CDN   = 0.45;
 export const PLR_ATK_DMG   = 30;
 export const PLR_INV_TIME  = 0.6;
 
+// ── Tekstury Potworów (Proceduralne) ──────────────────────────
+const textureCache = new Map();
+
+function getMonsterTexture(type, colorBase, colorPattern) {
+  const cacheKey = `${type}_${colorBase}_${colorPattern}`;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+
+  const size = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  // Base fill
+  ctx.fillStyle = '#' + new THREE.Color(colorBase).getHexString();
+  ctx.fillRect(0, 0, size, size);
+
+  ctx.strokeStyle = '#' + new THREE.Color(colorPattern).getHexString();
+  ctx.lineWidth = 2;
+
+  if (type === 'golem') {
+    // Cracked stone
+    for (let i = 0; i < 40; i++) {
+        ctx.beginPath();
+        ctx.moveTo(Math.random() * size, Math.random() * size);
+        ctx.lineTo(Math.random() * size, Math.random() * size);
+        ctx.stroke();
+    }
+  } else if (type === 'wraith') {
+    // Ghostly swirls
+    ctx.globalAlpha = 0.4;
+    for (let i = 0; i < 15; i++) {
+        ctx.beginPath();
+        ctx.arc(Math.random() * size, Math.random() * size, Math.random() * 40, 0, Math.PI * 2);
+        ctx.fill();
+    }
+  } else if (type === 'drone') {
+    // Tech grid
+    ctx.lineWidth = 1;
+    for (let i = 0; i < size; i += 16) {
+        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, size); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(size, i); ctx.stroke();
+    }
+  } else if (type === 'elemental') {
+    // Ice crystals
+    for (let i = 0; i < 30; i++) {
+        ctx.beginPath();
+        const x = Math.random() * size, y = Math.random() * size;
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + 20, y + 20);
+        ctx.lineTo(x - 20, y + 20);
+        ctx.closePath();
+        ctx.stroke();
+    }
+  } else if (type === 'imp') {
+    // Magma veins
+    ctx.lineWidth = 4;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = ctx.strokeStyle;
+    for (let i = 0; i < 12; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, Math.random() * size);
+        ctx.bezierCurveTo(size/3, Math.random()*size, 2*size/3, Math.random()*size, size, Math.random()*size);
+        ctx.stroke();
+    }
+  }
+
+  else if (type === 'weapon') {
+    // Damascus steel waves
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 60; i++) {
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(255,255,255,${0.1 + Math.random()*0.2})`;
+        const y = Math.random() * size;
+        ctx.moveTo(0, y);
+        ctx.bezierCurveTo(size/4, y+20, 3*size/4, y-20, size, y);
+        ctx.stroke();
+    }
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  textureCache.set(cacheKey, tex);
+  return tex;
+}
+
 // Reusable vectors/colors to prevent GC thrash
 const _V1 = new THREE.Vector3();
 const _V2 = new THREE.Vector3();
@@ -30,14 +116,16 @@ export function createEnemyMesh(type) {
   const c = T[type] || T.golem;
   group.scale.setScalar(c.scale);
 
-  const bodyMat = new THREE.MeshStandardMaterial({ color:c.bc, roughness:0.7 });
+  // Better Textures
+  const texture = getMonsterTexture(type, c.bc, c.ec);
+  const bodyMat = new THREE.MeshStandardMaterial({ map: texture, roughness:0.8, metalness: type==='drone'?0.6:0.2 });
   const accentMat = new THREE.MeshStandardMaterial({ color:c.ac, roughness:0.6 });
   const eyeMat  = new THREE.MeshStandardMaterial({ color:c.ec, emissive:c.ec, emissiveIntensity:3 });
   group.userData.bodyMat = bodyMat;
 
   // ── TUŁÓW ──
   const bodyGeo = c.sphere
-    ? new THREE.SphereGeometry(c.bw*0.85, 10, 7)
+    ? new THREE.SphereGeometry(c.bw*0.85, 12, 12)
     : new THREE.BoxGeometry(c.bw, c.bh, c.bw*0.75);
   const body = new THREE.Mesh(bodyGeo, bodyMat);
   body.position.y = c.bh / 2 + (type==='drone'?1.3:0);
@@ -48,7 +136,7 @@ export function createEnemyMesh(type) {
 
   // ── GŁOWA ──
   const headR = c.sphere ? 0.28 : 0.24;
-  const head = new THREE.Mesh(new THREE.SphereGeometry(headR, 8, 6), accentMat);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(headR, 8, 6), bodyMat);
   head.position.y = c.bh + (c.sphere ? 0.75 : 0.24);
   head.castShadow = true;
   group.add(head);
@@ -67,7 +155,7 @@ export function createEnemyMesh(type) {
     const legW  = c.bw * 0.32;
     const legGeo = new THREE.BoxGeometry(legW, legH, legW * 0.9);
     ['leftLeg','rightLeg'].forEach((name, i) => {
-      const leg = new THREE.Mesh(legGeo, accentMat);
+      const leg = new THREE.Mesh(legGeo, bodyMat);
       leg.position.set((i===0?-1:1) * c.bw*0.22, -(legH*0.5 + 0.02), 0);
       leg.castShadow = true;
       body.add(leg);                    // child of body for proper pivot
@@ -81,7 +169,7 @@ export function createEnemyMesh(type) {
     const armW  = c.bw * 0.28;
     const armGeo = new THREE.BoxGeometry(armW, armH, armW * 0.85);
     ['leftArm','rightArm'].forEach((name, i) => {
-      const arm = new THREE.Mesh(armGeo, accentMat);
+      const arm = new THREE.Mesh(armGeo, bodyMat);
       arm.position.set((i===0?-1:1) * (c.bw*0.5 + armW*0.5), c.bh*0.1, 0);
       arm.castShadow = true;
       body.add(arm);
@@ -339,9 +427,10 @@ export function createWeaponScene() {
   const weaponGroup = new THREE.Group();
 
   // Ostrze
+  const wpnTex = getMonsterTexture('weapon', 0xddeeff, 0x88bbff);
   const blade = new THREE.Mesh(
     new THREE.BoxGeometry(0.045, 0.58, 0.028),
-    new THREE.MeshStandardMaterial({ color:0xddeeff, metalness:0.95, roughness:0.05 }));
+    new THREE.MeshStandardMaterial({ map: wpnTex, metalness:0.95, roughness:0.05 }));
   blade.position.y = 0.29;
   weaponGroup.add(blade);
 

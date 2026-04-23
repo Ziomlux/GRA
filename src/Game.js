@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { Player } from './Player.js';
+import { HubIsland } from './worlds/HubIsland.js';
 import { AncientRuins } from './worlds/AncientRuins.js';
 import { MistyForest } from './worlds/MistyForest.js';
 import { SpaceStation } from './worlds/SpaceStation.js';
@@ -31,7 +32,7 @@ export class Game {
     this.inventoryOpen = false;
 
     // Build worlds list
-    this.worldClasses = [AncientRuins, MistyForest, SpaceStation, IceCave, Volcano];
+    this.worldClasses = [HubIsland, AncientRuins, MistyForest, SpaceStation, IceCave, Volcano];
     this.worlds = [];
 
     // Player

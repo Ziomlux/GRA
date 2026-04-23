@@ -181,7 +181,7 @@ export class SpaceStation extends World {
     const prev = createPortal({
       position: new THREE.Vector3(0, 1.6, 17),
       color: '#52b788',
-      targetWorldIndex: 1,
+      targetWorldIndex: 2,
       direction: 'next',
       exitPosition: new THREE.Vector3(0, 1.7, 13),
     });
@@ -191,7 +191,7 @@ export class SpaceStation extends World {
     const next = createPortal({
       position: new THREE.Vector3(0, 1.6, -17),
       color: '#90e0ef',
-      targetWorldIndex: 3,
+      targetWorldIndex: 4,
       direction: 'prev',
       exitPosition: new THREE.Vector3(0, 1.7, -13),
     });

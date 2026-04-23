@@ -152,21 +152,21 @@ export class MistyForest extends World {
   }
 
   buildPortals() {
-    // Back to Ancient Ruins
+    // Back to Ancient Ruins (index 1)
     const prev = createPortal({
       position: new THREE.Vector3(0, 1.6, 18),
       color: '#f4a261',
-      targetWorldIndex: 0,
+      targetWorldIndex: 1,
       direction: 'next',
       exitPosition: new THREE.Vector3(0, 1.7, 14),
     });
     this.portals.push(prev);
 
-    // Forward to Space Station
+    // Forward to Space Station (index 3)
     const next = createPortal({
       position: new THREE.Vector3(0, 1.6, -18),
       color: '#4361ee',
-      targetWorldIndex: 2,
+      targetWorldIndex: 3,
       direction: 'prev',
       exitPosition: new THREE.Vector3(0, 1.7, -14),
     });

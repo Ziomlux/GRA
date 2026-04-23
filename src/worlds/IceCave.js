@@ -190,7 +190,7 @@ export class IceCave extends World {
     const prev = createPortal({
       position: new THREE.Vector3(0, 1.6, 18),
       color: '#4361ee',
-      targetWorldIndex: 2,
+      targetWorldIndex: 3,
       direction: 'next',
       exitPosition: new THREE.Vector3(0, 1.7, 14),
     });
@@ -200,7 +200,7 @@ export class IceCave extends World {
     const next = createPortal({
       position: new THREE.Vector3(0, 1.6, -18),
       color: '#e63946',
-      targetWorldIndex: 4,
+      targetWorldIndex: 5,
       direction: 'prev',
       exitPosition: new THREE.Vector3(0, 1.7, -14),
     });

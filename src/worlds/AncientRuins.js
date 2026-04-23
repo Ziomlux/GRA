@@ -152,11 +152,21 @@ export class AncientRuins extends World {
   }
 
   buildPortals() {
-    // Portal to next world (MistyForest), placed on north side
+    // Portal back to Hub Island
+    const toHub = createPortal({
+      position: new THREE.Vector3(0, 1.6, 17),
+      color: '#f4a261',
+      targetWorldIndex: 0,
+      direction: 'next',
+      exitPosition: new THREE.Vector3(0, 1.7, 13),
+    });
+    this.portals.push(toHub);
+
+    // Portal to next world (MistyForest, index 2)
     const next = createPortal({
       position: new THREE.Vector3(0, 1.6, -17),
       color: '#52b788',
-      targetWorldIndex: 1,
+      targetWorldIndex: 2,
       direction: 'prev',
       exitPosition: new THREE.Vector3(0, 1.7, -13),
     });

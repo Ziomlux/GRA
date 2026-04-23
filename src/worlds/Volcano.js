@@ -232,7 +232,7 @@ export class Volcano extends World {
     const prev = createPortal({
       position: new THREE.Vector3(0, 1.6, 18),
       color: '#90e0ef',
-      targetWorldIndex: 3,
+      targetWorldIndex: 4,
       direction: 'next',
       exitPosition: new THREE.Vector3(0, 1.7, 14),
     });
@@ -242,7 +242,7 @@ export class Volcano extends World {
     const next = createPortal({
       position: new THREE.Vector3(0, 1.6, -18),
       color: '#f4a261',
-      targetWorldIndex: 0,
+      targetWorldIndex: 1,
       direction: 'prev',
       exitPosition: new THREE.Vector3(0, 1.7, -14),
     });
@@ -252,7 +252,7 @@ export class Volcano extends World {
     const secret = createPortal({
       position: new THREE.Vector3(18, 1.6, 0),
       color: '#000000', // Black hole look
-      targetWorldIndex: 0,
+      targetWorldIndex: 1,
       direction: 'prev',
       exitPosition: new THREE.Vector3(0, 1.7, 14),
     });
