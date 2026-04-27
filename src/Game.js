@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { Player } from './Player.js';
+import { PostProcessing } from './PostProcessing.js';
 import { HubIsland } from './worlds/HubIsland.js';
 import { AncientRuins } from './worlds/AncientRuins.js';
 import { MistyForest } from './worlds/MistyForest.js';
@@ -14,21 +15,23 @@ export class Game {
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       antialias: true,
+      powerPreference: 'high-performance',
     });
-    this.renderer.autoClear = false; // Required for weapon overlay
+    this.renderer.autoClear = false;
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    this.renderer.toneMapping = THREE.NoToneMapping; // Simplified for stability
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.0;
     this.renderer.setClearColor(0x000000);
+    if (THREE.SRGBColorSpace) this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     this.clock = new THREE.Clock();
     this.running = false;
     this.transitioning = false;
     this.currentWorldIndex = 0;
-    this.difficultyLoop = 0; // NG+ level
+    this.difficultyLoop = 0;
     this.inventoryOpen = false;
 
     // Build worlds list
@@ -41,6 +44,13 @@ export class Game {
     // Combat
     this.weaponScene = ENEMY.createWeaponScene();
     this.weaponCam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 10);
+
+    // Post-processing (initialized with a temp scene, updated on loadWorld)
+    this.postProcessing = new PostProcessing(
+      this.renderer,
+      new THREE.Scene(),
+      this.player.camera
+    );
 
     // Initial HUD update
     ENEMY.updateHPBar(this.player);
@@ -88,7 +98,6 @@ export class Game {
           this.updateStatsUI();
           ENEMY.updateHPBar(this.player);
           ENEMY.updateXPBar(this.player);
-          // Visual feedback on button
           btn.style.background = '#00d4ff';
           setTimeout(() => btn.style.background = '', 200);
         }
@@ -103,14 +112,23 @@ export class Game {
     // Scene
     this.scene = world.scene;
 
+    // Update post-processing for this world
+    this.postProcessing.setScene(world.scene, this.player.camera);
+    this.postProcessing.setProfile(world.worldType);
+
     // Update HUD
     document.getElementById('world-icon').textContent = world.icon;
     document.getElementById('world-name').textContent = world.name;
 
-    // Place player at world spawn (or opposite portal if coming through)
-    const spawnPos = (fromPortalDir === 'prev')
-      ? world.portals[0]?.exitPosition?.clone() || new THREE.Vector3(0, 1.7, 14)
-      : world.portals[world.portals.length - 1]?.exitPosition?.clone() || new THREE.Vector3(0, 1.7, -14);
+    // Spawn position based on portal direction
+    let spawnPos = new THREE.Vector3(0, 1.7, 14);
+    if (fromPortalDir === 'prev') {
+      spawnPos = world.portals[world.portals.length - 1]?.exitPosition?.clone() || new THREE.Vector3(0, 1.7, -14);
+    } else if (fromPortalDir === 'next') {
+      spawnPos = world.portals[0]?.exitPosition?.clone() || new THREE.Vector3(0, 1.7, 14);
+    } else {
+      spawnPos = new THREE.Vector3(0, 1.7, 8);
+    }
 
     spawnPos.y = 1.7;
     this.player.camera.position.copy(spawnPos);
@@ -118,13 +136,11 @@ export class Game {
     this.player.pitch = 0;
     this.player.updateCamera();
 
-    // --- Cleanup & Spawn enemies ---
-    // Remove old enemies from scene to prevent duplication lag
+    // Cleanup & Spawn enemies
     if (world.enemies && world.enemies.length > 0) {
       world.enemies.forEach(en => {
         if (en.mesh) {
           this.scene.remove(en.mesh);
-          // Proper disposal
           en.mesh.traverse(obj => {
             if (obj.isMesh) {
               obj.geometry.dispose();
@@ -154,10 +170,12 @@ export class Game {
       ENEMY.updateWeapon(this.weaponScene, this.player, delta, this.player._isMoving, this.player._wantsAttack);
       this.checkPortalCollisions();
       this.drawMinimap();
+      this.postProcessing.update(delta);
     }
 
+    // Render: post-processed scene + weapon overlay
     this.renderer.clear();
-    this.renderer.render(this.scene, this.player.camera);
+    this.postProcessing.render();
     this.renderer.clearDepth();
     this.renderer.render(this.weaponScene.scene, this.weaponCam);
   }
@@ -188,7 +206,6 @@ export class Game {
     const overlay = document.getElementById('portal-overlay');
     overlay.classList.add('active');
 
-    // Set overlay color to match target world
     const world = this.worlds[targetIndex];
     overlay.style.background = `radial-gradient(circle at center, ${world.portalColor}, #000)`;
 
@@ -207,13 +224,11 @@ export class Game {
     const world = this.worlds[this.currentWorldIndex];
     ctx.clearRect(0, 0, w, h);
 
-    // Background
     ctx.fillStyle = world.minimapBg || '#111';
     ctx.beginPath();
     ctx.roundRect(0, 0, w, h, 6);
     ctx.fill();
 
-    // Floor outline
     ctx.strokeStyle = 'rgba(255,255,255,0.2)';
     ctx.lineWidth = 1;
     ctx.strokeRect(10, 10, 100, 100);
@@ -222,7 +237,6 @@ export class Game {
     const cx = w / 2;
     const cy = h / 2;
 
-    // Draw portals on minimap
     for (const portal of world.portals) {
       const px = cx + portal.mesh.position.x * scale;
       const py = cy - portal.mesh.position.z * scale;
@@ -236,7 +250,6 @@ export class Game {
       ctx.shadowBlur = 0;
     }
 
-    // Draw obstacles
     if (world.mapObjects) {
       ctx.fillStyle = 'rgba(255,255,255,0.15)';
       for (const obj of world.mapObjects) {
@@ -246,11 +259,8 @@ export class Game {
       }
     }
 
-    // Player dot
     const ppx = cx + this.player.camera.position.x * scale;
     const ppy = cy - this.player.camera.position.z * scale;
-
-    // Player direction arrow
     const angle = -this.player.yaw;
     ctx.save();
     ctx.translate(ppx, ppy);
@@ -329,23 +339,25 @@ export class Game {
     const overlay = document.getElementById('portal-overlay');
     overlay.classList.add('active');
     this.transitioning = true;
-    
+
     setTimeout(() => {
       this.loadWorld(0);
       overlay.classList.remove('active');
       this.transitioning = false;
-      
-      // HUD Loop indicators (optional)
+
       const ni = document.getElementById('world-name');
       ni.textContent += ` (LOOP ${this.difficultyLoop})`;
     }, 1200);
   }
 
   onResize() {
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.player.camera.aspect = window.innerWidth / window.innerHeight;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    this.renderer.setSize(w, h);
+    this.player.camera.aspect = w / h;
     this.player.camera.updateProjectionMatrix();
-    this.weaponCam.aspect = window.innerWidth / window.innerHeight;
+    this.weaponCam.aspect = w / h;
     this.weaponCam.updateProjectionMatrix();
+    this.postProcessing.onResize(w, h);
   }
 }

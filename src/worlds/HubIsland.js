@@ -240,10 +240,10 @@ export class HubIsland extends World {
   buildPortals() {
     // Portal to AncientRuins (world index 1 after Hub shift)
     const toRuins = createPortal({
-      position: new THREE.Vector3(0, 1.6, -6),
+      position: new THREE.Vector3(0, 1.6, -12),
       color: '#f4a261',
       targetWorldIndex: 1,
-      direction: 'prev',
+      direction: 'next',
       exitPosition: new THREE.Vector3(0, 1.7, 14),
     });
     this.portals.push(toRuins);
