@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Portal Adventure</title>
+  <meta name="description" content="Portal Adventure – Mystery exploration across 6 unique worlds"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <script type="module" crossorigin src="/assets/index-Bl7P5_Eb.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DWuaE6xe.css">
+</head>
+<body>
+
+<!-- ═══════ START SCREEN ═══════ -->
+<div id="start-screen">
+  <div class="start-content">
+    <div class="portal-logo">
+      <div class="pr pr1"></div>
+      <div class="pr pr2"></div>
+      <div class="pr pr3"></div>
+      <div class="pi"></div>
+    </div>
+    <h1 class="game-title" data-i18n="gameTitle">PORTAL<br><span data-i18n="gameSubtitle">ADVENTURE</span></h1>
+    <p class="game-subtitle" data-i18n="tagline">Podróżuj przez 6 unikalnych światów</p>
+    <div class="worlds-preview">
+      <div class="wb" style="--c:#00d4ff">🏝️ Hub</div>
+      <div class="wb" style="--c:#f4a261">🏛️ Ruiny</div>
+      <div class="wb" style="--c:#52b788">🌲 Las</div>
+      <div class="wb" style="--c:#4361ee">🚀 Kosmos</div>
+      <div class="wb" style="--c:#90e0ef">❄️ Lód</div>
+      <div class="wb" style="--c:#e63946">🌋 Wulkan</div>
+    </div>
+    <div class="menu-buttons">
+      <button id="start-btn" class="menu-btn primary" data-i18n="startBtn">ROZPOCZNIJ PRZYGODĘ</button>
+      <button id="continue-btn" class="menu-btn" data-i18n="continueBtn" style="display:none">KONTYNUUJ</button>
+      <button id="load-btn" class="menu-btn" data-i18n="loadGame">WCZYTAJ GRĘ</button>
+      <button id="settings-menu-btn" class="menu-btn" data-i18n="settings">USTAWIENIA</button>
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl"><kbd>W A S D</kbd> <span data-i18n="move">Ruch</span></div>
+      <div class="ctrl"><kbd>Mysz</kbd> <span data-i18n="camera">Kamera</span></div>
+      <div class="ctrl"><kbd>Shift</kbd> <span data-i18n="sprint">Sprint</span></div>
+      <div class="ctrl"><kbd>ESC</kbd> <span data-i18n="pause">Pauza</span></div>
+    </div>
+    <div class="lang-switch">
+      <button class="lang-btn" data-lang="pl">🇵🇱 PL</button>
+      <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ LOADING SCREEN ═══════ -->
+<div id="loading-screen" class="hidden">
+  <div class="loading-content">
+    <div class="loading-spinner">
+      <div class="pr pr1"></div>
+      <div class="pr pr2"></div>
+      <div class="pi"></div>
+    </div>
+    <h2 id="loading-text" data-i18n="loading">ŁADOWANIE...</h2>
+    <div class="loading-bar"><div class="loading-fill" id="loading-fill"></div></div>
+    <p id="loading-tip" class="loading-tip"></p>
+  </div>
+</div>
+
+<!-- ═══════ SETTINGS PANEL ═══════ -->
+<div id="settings-panel" class="hidden">
+  <div class="settings-content">
+    <h2 class="settings-title" data-i18n="settingsTitle">USTAWIENIA</h2>
+
+    <div class="settings-tabs">
+      <button class="stab active" data-stab="gfx" data-i18n="graphics">GRAFIKA</button>
+      <button class="stab" data-stab="aud" data-i18n="audio">DŹWIĘK</button>
+      <button class="stab" data-stab="ctrl" data-i18n="controls">STEROWANIE</button>
+    </div>
+
+    <!-- Graphics -->
+    <div class="stab-pane active" id="stab-gfx">
+      <div class="setting-row">
+        <span data-i18n="quality">Jakość</span>
+        <select id="set-quality"><option value="low">Niska</option><option value="medium">Średnia</option><option value="high" selected>Wysoka</option><option value="ultra">Ultra</option></select>
+      </div>
+      <div class="setting-row">
+        <span data-i18n="shadows">Cienie</span>
+        <button class="toggle-btn active" id="set-shadows" data-i18n-on="on" data-i18n-off="off">WŁ</button>
+      </div>
+      <div class="setting-row">
+        <span data-i18n="bloom">Bloom</span>
+        <button class="toggle-btn active" id="set-bloom">WŁ</button>
+      </div>
+      <div class="setting-row">
+        <span data-i18n="fullscreen">Pełny ekran</span>
+        <button class="toggle-btn" id="set-fullscreen">WYŁ</button>
+      </div>
+      <div class="setting-row">
+        <span data-i18n="fpsCounter">Licznik FPS</span>
+        <button class="toggle-btn" id="set-fps">WYŁ</button>
+      </div>
+    </div>
+
+    <!-- Audio -->
+    <div class="stab-pane" id="stab-aud">
+      <div class="setting-row">
+        <span data-i18n="masterVol">Głośność główna</span>
+        <input type="range" min="0" max="100" value="80" id="set-master" class="slider"/>
+        <span class="slider-val" id="val-master">80%</span>
+      </div>
+      <div class="setting-row">
+        <span data-i18n="musicVol">Muzyka</span>
+        <input type="range" min="0" max="100" value="60" id="set-music" class="slider"/>
+        <span class="slider-val" id="val-music">60%</span>
+      </div>
+      <div class="setting-row">
+        <span data-i18n="sfxVol">Efekty</span>
+        <input type="range" min="0" max="100" value="80" id="set-sfx" class="slider"/>
+        <span class="slider-val" id="val-sfx">80%</span>
+      </div>
+      <div class="setting-row">
+        <span data-i18n="ambientVol">Otoczenie</span>
+        <input type="range" min="0" max="100" value="70" id="set-ambient" class="slider"/>
+        <span class="slider-val" id="val-ambient">70%</span>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="stab-pane" id="stab-ctrl">
+      <div class="setting-row">
+        <span data-i18n="sensitivity">Czułość myszy</span>
+        <input type="range" min="10" max="300" value="100" id="set-sens" class="slider"/>
+        <span class="slider-val" id="val-sens">1.0x</span>
+      </div>
+      <div class="setting-row">
+        <span data-i18n="invertY">Odwróć oś Y</span>
+        <button class="toggle-btn" id="set-inverty">WYŁ</button>
+      </div>
+      <div class="setting-row">
+        <span data-i18n="language">Język</span>
+        <select id="set-language"><option value="pl">🇵🇱 Polski</option><option value="en">🇬🇧 English</option></select>
+      </div>
+    </div>
+
+    <div class="settings-footer">
+      <button id="settings-back" class="menu-btn" data-i18n="back">← Wróć</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SAVE/LOAD PANEL ═══════ -->
+<div id="saveload-panel" class="hidden">
+  <div class="saveload-content">
+    <h2 id="saveload-title">WCZYTAJ GRĘ</h2>
+    <div class="save-slots">
+      <div class="save-slot" data-slot="auto">
+        <div class="slot-header">⟳ <span data-i18n="autoSave">Autozapis</span></div>
+        <div class="slot-info" id="slot-auto-info"><span data-i18n="emptySlot">Pusty slot</span></div>
+      </div>
+      <div class="save-slot" data-slot="0">
+        <div class="slot-header">1. <span data-i18n="saveSlot">Slot</span> 1</div>
+        <div class="slot-info" id="slot-0-info"><span data-i18n="emptySlot">Pusty slot</span></div>
+      </div>
+      <div class="save-slot" data-slot="1">
+        <div class="slot-header">2. <span data-i18n="saveSlot">Slot</span> 2</div>
+        <div class="slot-info" id="slot-1-info"><span data-i18n="emptySlot">Pusty slot</span></div>
+      </div>
+      <div class="save-slot" data-slot="2">
+        <div class="slot-header">3. <span data-i18n="saveSlot">Slot</span> 3</div>
+        <div class="slot-info" id="slot-2-info"><span data-i18n="emptySlot">Pusty slot</span></div>
+      </div>
+    </div>
+    <div class="settings-footer">
+      <button id="saveload-back" class="menu-btn" data-i18n="back">← Wróć</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ NOTIFICATION TOAST ═══════ -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- ═══════ FPS COUNTER ═══════ -->
+<div id="fps-counter" class="hidden">0 FPS</div>
+
+<!-- ═══════ LEVEL UP NOTIFICATION ═══════ -->
+<div id="level-up-notif" class="hidden">
+  <div class="lvl-up-content">
+    <h3 data-i18n="levelUp">AWANS!</h3>
+    <p data-i18n="levelUpMsg">Otrzymałeś punkty statystyk</p>
+  </div>
+</div>
+
+<!-- ═══════ INVENTORY ═══════ -->
+<div id="inventory-overlay" class="hidden">
+  <div class="inv-content">
+    <div class="inv-header">
+      <div class="inv-tab active" data-tab="stats" data-i18n="statsTab">STATYSTYKI</div>
+      <div class="inv-tab" data-tab="items" data-i18n="itemsTab">PRZEDMIOTY</div>
+      <div id="close-inv">×</div>
+    </div>
+    <div id="tab-stats" class="tab-pane active">
+      <div class="stats-grid">
+        <div class="stat-row"><div class="stat-info"><span class="stat-label" data-i18n="level">POZIOM</span><span id="st-level" class="stat-value">1</span></div></div>
+        <div class="stat-row"><div class="stat-info"><span class="stat-label" data-i18n="points">PUNKTY</span><span id="st-points" class="stat-value">0</span></div></div>
+        <hr>
+        <div class="stat-row"><div class="stat-info"><span class="stat-label" data-i18n="strength">SIŁA (Atak)</span><span id="st-strength" class="stat-value">1.0</span></div><button class="upgrade-btn" data-stat="strength">+</button></div>
+        <div class="stat-row"><div class="stat-info"><span class="stat-label" data-i18n="vitality">WIT (Zdrowie)</span><span id="st-vitality" class="stat-value">1</span></div><button class="upgrade-btn" data-stat="vitality">+</button></div>
+        <div class="stat-row"><div class="stat-info"><span class="stat-label" data-i18n="agility">ZRE (Szybkość)</span><span id="st-agility" class="stat-value">1.0</span></div><button class="upgrade-btn" data-stat="agility">+</button></div>
+        <hr>
+        <div class="stat-row"><div class="stat-info"><span class="stat-label" data-i18n="health">ZDROWIE</span><span id="st-hp" class="stat-value">100 / 100</span></div></div>
+        <div class="stat-row"><div class="stat-info"><span class="stat-label" data-i18n="exp">EXP</span><span id="st-xp" class="stat-value">0 / 100</span></div></div>
+      </div>
+    </div>
+    <div id="tab-items" class="tab-pane">
+      <div class="placeholder-text" data-i18n="emptyBag">Twoja torba jest pusta...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ GAME CANVAS ═══════ -->
+<canvas id="game-canvas"></canvas>
+
+<!-- ═══════ HUD ═══════ -->
+<div id="hud" class="hidden">
+  <div id="world-info">
+    <div id="world-icon"></div>
+    <div id="world-name"></div>
+  </div>
+  <div id="world-counter"></div>
+  <div id="portal-hint" class="hidden">
+    <div class="hint-arrow">↑</div>
+    <div data-i18n="portalHint">Wejdź w portal!</div>
+  </div>
+  <div id="minimap">
+    <canvas id="minimap-canvas" width="120" height="120"></canvas>
+    <div class="mm-label" data-i18n="map">MAPA</div>
+  </div>
+  <div id="hp-bar-wrap">
+    <div id="hp-icon">❤</div>
+    <div id="hp-bar"><div id="hp-fill"></div></div>
+    <span id="hp-text">100 HP</span>
+  </div>
+  <div id="xp-bar-wrap">
+    <div id="xp-icon">⚡</div>
+    <div id="xp-bar"><div id="xp-fill"></div></div>
+    <span id="xp-text">Lvl 1</span>
+  </div>
+  <div id="kill-counter">☠ 0</div>
+  <div id="attack-indicator"></div>
+  <div id="enemy-alert"></div>
+  <div id="crosshair">+</div>
+  <div id="ctrl-overlay">
+    <span><kbd>WASD</kbd> <span data-i18n="move">Ruch</span></span>
+    <span><kbd>Shift</kbd> <span data-i18n="sprint">Sprint</span></span>
+    <span class="atk-hint"><kbd>LMB / E</kbd> <span data-i18n="attack">Atak</span></span>
+    <span><kbd>ESC</kbd> <span data-i18n="pause">Pauza</span></span>
+  </div>
+</div>
+
+<!-- ═══════ OVERLAYS ═══════ -->
+<div id="portal-overlay"></div>
+<div id="damage-overlay"></div>
+<div id="death-screen" class="hidden">
+  <h2 data-i18n="died">POLEGŁEŚ</h2>
+  <p data-i18n="respawning">ODRADZASZ SIĘ...</p>
+</div>
+
+<!-- ═══════ PAUSE SCREEN ═══════ -->
+<div id="pause-screen" class="hidden">
+  <div class="pause-content">
+    <h2 data-i18n="pauseTitle">PAUZA</h2>
+    <button id="resume-btn" data-i18n="resume">▶ Wznów</button>
+    <button id="save-btn" data-i18n="saveGame">💾 Zapisz grę</button>
+    <button id="pause-settings-btn" data-i18n="settings">⚙ Ustawienia</button>
+    <button id="menu-btn" data-i18n="mainMenu">🏠 Menu główne</button>
+  </div>
+</div>
+
+</body>
+</html>
